@@ -3,18 +3,21 @@ use embedded_hal::digital::{InputPin, OutputPin};
 
 use crate::state::{PomodoroPhase, PomodoroState};
 
+//作業の時間
 const WORK_DURATION_SECS: u32 = 25 * 60;
+//短い休憩の時間
 const SHORT_BREAK_DURATION_SECS: u32 = 5 * 60;
+//長い休憩の時間
 const LONG_BREAK_DURATION_SECS: u32 = 15 * 60;
 
-// const WORK_DURATION_SECS: u32 = 5;
-// const SHORT_BREAK_DURATION_SECS: u32 = 3;
-// const LONG_BREAK_DURATION_SECS: u32 = 4;
-
+//何ポモドーロで長い休憩に入るか
 const WORK_COUNT_FOR_LONG_BREAK: u16 = 4;
 
+//作業終了時のパッシブブザーの周波数
 const WORK_END_FREQ: u32 = 500;
+//短い休憩終了時のパッシブブザーの周波数
 const SHORT_BREAK_END_FREQ: u32 = 800;
+//長い休憩終了時のパッシブブザーの周波数
 const LONG_BREAK_END_FREQ: u32 = 1000;
 
 pub trait Buzzer {
@@ -114,18 +117,21 @@ where
         }
     }
 
+    //作業
     async fn work(&mut self) {
         self.state.phase = PomodoroPhase::Work;
         self.set_leds(true, false, false);
         self.timer_start(WORK_DURATION_SECS).await;
     }
 
+    //短い休憩
     async fn short_break(&mut self) {
         self.state.phase = PomodoroPhase::ShortBreak;
         self.set_leds(false, true, false);
         self.timer_start(SHORT_BREAK_DURATION_SECS).await;
     }
 
+    //長い休憩
     async fn long_break(&mut self) {
         self.state.phase = PomodoroPhase::LongBreak;
         self.set_leds(false, false, true);
@@ -141,17 +147,21 @@ where
             loop {
                 self.work().await;
                 self.state.counter += 1;
+
+                //次が長い休憩ならwork_ledとlong_break_ledを光らせる
                 if self.state.counter >= WORK_COUNT_FOR_LONG_BREAK {
                     self.set_leds(true, false, true);
                 } else {
                     self.set_leds(true, true, false);
                 }
+
                 self.buzzer.beep(WORK_END_FREQ);
                 self.vibration.set_high().ok();
                 self.wait_button1().await;
                 self.buzzer.silence();
                 self.vibration.set_low().ok();
 
+                //指定回数のポモドーロの後、長い休憩に移行
                 if self.state.counter >= WORK_COUNT_FOR_LONG_BREAK {
                     break;
                 }

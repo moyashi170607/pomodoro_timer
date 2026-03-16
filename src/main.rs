@@ -15,6 +15,7 @@ use {ch32_hal as hal, panic_halt as _};
 pub mod pomodoro;
 pub mod state;
 
+//ch32-hal用のブザー構造体
 struct Ch32Buzzer<'a> {
     pwm: SimplePwm<'a, TIM1>,
     ch: Channel,
@@ -64,6 +65,7 @@ async fn main(_spawner: embassy_executor::Spawner) {
     let button1_pin = Input::new(p.PD0, ch32_hal::gpio::Pull::Up);
     let button2_pin = Input::new(p.PC7, ch32_hal::gpio::Pull::Up);
 
+    //Pomodoroの初期化
     let mut pomodoro = Pomodoro::new(
         work_led_pin,
         short_break_led_pin,
@@ -75,6 +77,8 @@ async fn main(_spawner: embassy_executor::Spawner) {
     );
 
     pomodoro.set_leds(false, false, false);
+
+    //ボタンが押されるまで待つ
     pomodoro.wait_button1().await;
     pomodoro.start().await;
 }
