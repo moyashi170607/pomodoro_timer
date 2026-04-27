@@ -76,6 +76,8 @@ RustとEmbassy非同期ランタイムを使用しています。
 
 `src/main.rs`以外は、`embedded-hal`を用い、`ch32-hal`に依存しないように作成したため、他のチップでも動くと思います。
 
+https://github.com/user-attachments/assets/0f5a5919-d88c-4be7-9235-b88e820856ae
+
 ## 機能
 
 - **ポモドーロサイクル**
