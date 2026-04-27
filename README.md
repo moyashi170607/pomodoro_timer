@@ -1,5 +1,76 @@
 # pomodoro_timer
 
+A Pomodoro timer implementation for the CH32V003F4P6 microcontroller.
+Built with Rust and the Embassy async runtime.
+
+Files other than `src/main.rs` are written using `embedded-hal` without depending on `ch32-hal`, so they should work on other chips as well.
+
+## Features
+
+- **Pomodoro cycle**
+  - Work: 25 minutes
+  - Short break: 5 minutes
+  - Long break: 15 minutes (every 4 pomodoros)
+- Phase indication via LEDs
+- Passive buzzer and vibration motor notification at the end of each phase
+- Button to start the timer and advance to the next phase
+
+Durations and the number of pomodoros before a long break can be changed by editing the corresponding constants in `src/pomodoro.rs`.
+
+## Hardware Configuration
+
+| Function              | Pin  |
+| --------------------- | ---- |
+| Work LED              | PC6  |
+| Short break LED       | PC2  |
+| Long break LED        | PC5  |
+| Passive buzzer        | PC3  |
+| Vibration motor       | PA2  |
+| Button 1 (Start/Next) | PD0  |
+| Button 2 (unused)     | PC7  |
+
+## Usage
+
+1. Flash the device
+2. Press **Button 1** to start the timer
+3. At the end of each phase, the buzzer and vibration motor will notify you
+4. Press **Button 1** to advance to the next phase
+
+## Setup
+
+### Required Tools
+
+- Rust nightly (configured automatically via `rust-toolchain.toml`)
+- [minichlink](https://github.com/cnlohr/ch32fun/tree/master/minichlink) (flashing tool) — add to your PATH
+- `rust-objcopy`
+
+```bash
+cargo install cargo-binutils
+rustup component add llvm-tools-preview
+```
+
+## Build
+
+```bash
+cargo build --release
+```
+
+## Flash
+
+```bash
+cargo run --release
+```
+
+Running `cargo run` converts the binary with `rust-objcopy` and flashes it to the device using `minichlink`.
+
+## License
+
+MIT OR Apache-2.0
+
+---
+
+# pomodoro_timer
+
 CH32V003F4P6マイコン向けのポモドーロタイマー実装です。
 RustとEmbassy非同期ランタイムを使用しています。
 
